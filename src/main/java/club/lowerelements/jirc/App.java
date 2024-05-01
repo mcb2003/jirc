@@ -1,7 +1,12 @@
 package club.lowerelements.jirc;
 
+import javax.swing.SwingUtilities;
+
 public class App {
   public static void main(String[] args) {
-    System.out.println("Hello, world!");
+    SwingUtilities.invokeLater(() -> {
+      var mainFrame = new MainFrame();
+      mainFrame.setVisible(true);
+    });
   }
 }
