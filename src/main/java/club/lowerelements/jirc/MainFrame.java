@@ -9,12 +9,14 @@ public class MainFrame extends JFrame {
   private JList messageList;
   private JTextField messageField;
 
-  public MainFrame() {
+  MainFrame(Controller controller) {
+    addWindowListener(controller.getWindowListener());
+
     setTitle("JIRC");
     setSize(800, 600);
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-    setJMenuBar(makeMenuBar());
+    setJMenuBar(makeMenuBar(controller));
     add(makeToolBar(), BorderLayout.NORTH);
 
     chatsTree = new JTree();
@@ -38,17 +40,20 @@ public class MainFrame extends JFrame {
     add(splitPane, BorderLayout.CENTER);
   }
 
-  private JMenuBar makeMenuBar() {
+  private JMenuBar makeMenuBar(Controller controller) {
     JMenuBar menuBar = new JMenuBar();
+    JMenu menu;
+    JMenuItem item;
 
-    JMenu fileMenu = new JMenu("File");
-    fileMenu.setMnemonic(KeyEvent.VK_F);
+    menu = new JMenu("File");
+    menu.setMnemonic(KeyEvent.VK_F);
 
-    JMenuItem exitItem = new JMenuItem("Exit");
-    exitItem.setMnemonic(KeyEvent.VK_X);
-    exitItem.addActionListener(e -> this.dispose());
-    fileMenu.add(exitItem);
-    menuBar.add(fileMenu);
+    item = new JMenuItem(controller.getNewWindowAction());
+    menu.add(item);
+    item = new JMenuItem(controller.getExitAction());
+    menu.add(item);
+
+    menuBar.add(menu);
 
     return menuBar;
   }
