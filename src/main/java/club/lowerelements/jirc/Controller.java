@@ -1,5 +1,6 @@
 package club.lowerelements.jirc;
 
+import java.awt.Component;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
@@ -11,6 +12,7 @@ public class Controller {
   private WindowHandler windowAdapter = new WindowHandler();
   private Action exitAction = new ExitAction();
   private Action newWindowAction = new NewWindowAction();
+  private Action addNetworkAction = new AddNetworkAction();
 
   Action getExitAction() { return exitAction; }
 
@@ -61,6 +63,22 @@ public class Controller {
       // Remove the window from our Set
       var w = (MainFrame)e.getSource();
       windows.remove(w);
+    }
+  }
+
+  Action getAddNetworkAction() { return addNetworkAction; }
+
+  private class AddNetworkAction extends AbstractAction {
+    public AddNetworkAction() {
+      super("Add Network");
+      putValue(SHORT_DESCRIPTION, "Connect to a new IRC network");
+      putValue(MNEMONIC_KEY, KeyEvent.VK_A);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      var dlg = new NetworkDialog((Component)e.getSource());
+      dlg.setVisible(true);
     }
   }
 }

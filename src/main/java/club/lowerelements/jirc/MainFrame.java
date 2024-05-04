@@ -17,7 +17,7 @@ public class MainFrame extends JFrame {
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
     setJMenuBar(makeMenuBar(controller));
-    add(makeToolBar(), BorderLayout.NORTH);
+    add(makeToolBar(controller), BorderLayout.NORTH);
 
     chatsTree = new JTree();
     chatsTree.getAccessibleContext().setAccessibleName("Channels");
@@ -48,6 +48,8 @@ public class MainFrame extends JFrame {
     menu = new JMenu("File");
     menu.setMnemonic(KeyEvent.VK_F);
 
+    item = new JMenuItem(controller.getAddNetworkAction());
+    menu.add(item);
     item = new JMenuItem(controller.getNewWindowAction());
     menu.add(item);
     item = new JMenuItem(controller.getExitAction());
@@ -58,5 +60,12 @@ public class MainFrame extends JFrame {
     return menuBar;
   }
 
-  private JToolBar makeToolBar() { return new JToolBar("Main Toolbar"); }
+  private JToolBar makeToolBar(Controller controller) {
+    var tb = new JToolBar("Main");
+    tb.getAccessibleContext().setAccessibleName("Main");
+
+    tb.add(new JButton(controller.getAddNetworkAction()));
+
+    return tb;
+  }
 }
