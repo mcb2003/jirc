@@ -12,7 +12,7 @@ public class MainFrame extends JFrame {
   public MainFrame() {
     setTitle("JIRC");
     setSize(800, 600);
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
     setJMenuBar(makeMenuBar());
     add(makeToolBar(), BorderLayout.NORTH);
@@ -46,7 +46,7 @@ public class MainFrame extends JFrame {
 
     JMenuItem exitItem = new JMenuItem("Exit");
     exitItem.setMnemonic(KeyEvent.VK_X);
-    exitItem.addActionListener(e -> System.exit(0));
+    exitItem.addActionListener(e -> this.dispose());
     fileMenu.add(exitItem);
     menuBar.add(fileMenu);
 
