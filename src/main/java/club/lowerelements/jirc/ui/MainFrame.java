@@ -32,6 +32,7 @@ public class MainFrame extends JFrame {
     messagePanel.add(new JScrollPane(messageList), BorderLayout.CENTER);
 
     messageField = new JTextField();
+    messageField.setEditable(false);
     messageField.getAccessibleContext().setAccessibleName("Message");
     messagePanel.add(messageField, BorderLayout.PAGE_END);
 
@@ -79,10 +80,18 @@ public class MainFrame extends JFrame {
         messageField.getAccessibleContext().setAccessibleName("Message to " +
                                                               log.getLogName());
         setTitle(log.getLogName() + " - Jirc");
+        messageField.setEditable(!log.isLogReadOnly());
+        if (log.isLogReadOnly()) {
+          messageField.setText("Chat is read-only");
+        } else {
+          messageField.setText("");
+        }
       } else {
         messageList.setModel(null);
-        messageField.getAccessibleContext().setAccessibleName("Message");
         setTitle("Jirc");
+        messageField.setEditable(false);
+        messageField.setText("Chat is read-only");
+        messageField.getAccessibleContext().setAccessibleName("Message");
       }
     }
   }

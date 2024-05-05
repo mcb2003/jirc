@@ -16,9 +16,9 @@ public class NetworkInfo {
     builder.nick(nick).user(user).realName(realName);
     builder.server().host(host).port(port, secure);
     builder.management().stsStorageManager(StsUtil.getDefaultStorageManager());
-    builder.listeners().input(System.out::println);
-    builder.listeners().output(System.out::println);
-    builder.listeners().exception(Throwable::printStackTrace);
+    // builder.listeners().input(System.out::println);
+    // builder.listeners().output(System.out::println);
+    // builder.listeners().exception(Throwable::printStackTrace);
 
     return builder;
   }

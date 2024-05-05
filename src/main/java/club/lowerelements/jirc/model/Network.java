@@ -1,13 +1,16 @@
 package club.lowerelements.jirc;
 
 import java.util.*;
+import net.engio.mbassy.bus.common.DeadMessage;
 import net.engio.mbassy.listener.Handler;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.element.ISupportParameter;
 import org.kitteh.irc.client.library.event.client.ClientNegotiationCompleteEvent;
+import org.kitteh.irc.client.library.event.client.ClientReceiveMotdEvent;
 import org.kitteh.irc.client.library.event.client.ISupportParameterEvent;
 import org.kitteh.irc.client.library.event.connection.ClientConnectionEndedEvent;
 import org.kitteh.irc.client.library.event.connection.ClientConnectionEstablishedEvent;
+import org.kitteh.irc.client.library.event.user.ServerNoticeEvent;
 
 public class Network implements MessageLog {
   private Client client;
@@ -42,6 +45,10 @@ public class Network implements MessageLog {
   @Override
   public String getLogName() {
     return name;
+  }
+  @Override
+  public boolean isLogReadOnly() {
+    return true;
   }
   @Override
   public MessageList getMessageList() {
@@ -92,6 +99,25 @@ public class Network implements MessageLog {
       name = param.getNetworkName();
       fireNameChangedEvent(oldName, name);
     }
+  }
+
+  @Handler
+  public void onServerNotice(ServerNoticeEvent e) {
+    serverMessages.addMessage(new Message(e.getMessage()));
+  }
+
+  @Handler
+  public void onMotd(ClientReceiveMotdEvent e) {
+    Optional<List<String>> motd = e.getMotd();
+    motd.ifPresent(msgs -> {
+      serverMessages.addMessages(msgs.stream().map(Message::new));
+    });
+  }
+
+  @Handler
+  public void onDeadMessage(DeadMessage msg) {
+    Object o = msg.getMessage();
+    System.err.println("Didn't handle: " + o);
   }
 
   public class StatusChangedEvent extends EventObject {
