@@ -1,10 +1,13 @@
 package club.lowerelements.jirc;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
 
 public class NetworkDialog extends JDialog {
+  private Set<Listener> listeners = new HashSet<>();
+
   // Server tab:
   private JTextField hostField = new JTextField();
   private JSpinner portField =
@@ -25,6 +28,7 @@ public class NetworkDialog extends JDialog {
 
     var addButton = new JButton("Add");
     addButton.setMnemonic(KeyEvent.VK_A);
+    addButton.addActionListener(this::onAdd);
     var cancelButton = new JButton("Cancel");
     cancelButton.setMnemonic(KeyEvent.VK_C);
     cancelButton.addActionListener(e -> this.dispose());
@@ -97,5 +101,49 @@ public class NetworkDialog extends JDialog {
     c.weightx = 0.7;
     c.fill = GridBagConstraints.HORIZONTAL;
     tab.add(component, c);
+  }
+
+  public NetworkInfo getNetworkInfo() {
+    var ni = new NetworkInfo();
+    ni.host = hostField.getText();
+    ni.port = ((Integer)portField.getValue()).shortValue();
+    ni.tls = secureToggle.isSelected();
+    ni.nick = nickField.getText();
+    ni.user = userField.getText();
+    ni.realName = realNameField.getText();
+    return ni;
+  }
+
+  private void onAdd(ActionEvent e) {
+    var ev = new AddEvent(e);
+    for (var l : listeners) {
+      l.networkAdded(ev);
+    }
+    dispose();
+  }
+
+  public void addNetworkListener(Listener l) { listeners.add(l); }
+
+  public void removeNetworkListener(Listener l) { listeners.remove(l); }
+
+  public class AddEvent extends EventObject {
+    private ActionEvent cause;
+
+    public AddEvent(ActionEvent cause) {
+      super(NetworkDialog.this);
+      this.cause = cause;
+    }
+
+    public ActionEvent getCause() { return cause; }
+
+    public NetworkDialog getNetworkDialog() { return NetworkDialog.this; }
+
+    public NetworkInfo getNetworkInfo() {
+      return NetworkDialog.this.getNetworkInfo();
+    }
+  }
+
+  public interface Listener extends EventListener {
+    public void networkAdded(AddEvent e);
   }
 }

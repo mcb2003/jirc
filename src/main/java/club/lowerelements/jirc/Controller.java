@@ -78,6 +78,13 @@ public class Controller {
     @Override
     public void actionPerformed(ActionEvent e) {
       var dlg = new NetworkDialog((Component)e.getSource());
+      dlg.addNetworkListener(new NetworkDialog.Listener() {
+        @Override
+        public void networkAdded(NetworkDialog.AddEvent e) {
+          System.out.println("Network added!");
+          System.out.println(e.getNetworkInfo());
+        }
+      });
       dlg.setVisible(true);
     }
   }
