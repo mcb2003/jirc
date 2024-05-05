@@ -9,12 +9,13 @@ import org.kitteh.irc.client.library.event.client.ISupportParameterEvent;
 import org.kitteh.irc.client.library.event.connection.ClientConnectionEndedEvent;
 import org.kitteh.irc.client.library.event.connection.ClientConnectionEstablishedEvent;
 
-public class Network {
+public class Network implements MessageLog {
   private Client client;
   private Status status = Status.DISCONNECTED;
 
   private NetworkInfo info;
   private String name;
+  private MessageList serverMessages = new MessageList();
 
   private Set<Listener> listeners = new HashSet<>();
 
@@ -37,6 +38,15 @@ public class Network {
   }
 
   public NetworkInfo getNetworkInfo() { return info; }
+
+  @Override
+  public String getLogName() {
+    return name;
+  }
+  @Override
+  public MessageList getMessageList() {
+    return serverMessages;
+  }
 
   public Status getStatus() { return status; }
 

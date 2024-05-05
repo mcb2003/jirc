@@ -3,6 +3,7 @@ package club.lowerelements.jirc;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
+import javax.swing.event.*;
 
 public class MainFrame extends JFrame {
   private JTree chatsTree;
@@ -22,6 +23,7 @@ public class MainFrame extends JFrame {
     chatsTree = new JTree(controller.getNetworkManager());
     chatsTree.getAccessibleContext().setAccessibleName("Channels");
     chatsTree.setRootVisible(false);
+    chatsTree.addTreeSelectionListener(new ChatsSelectionListener());
 
     var messagePanel = new JPanel(new BorderLayout());
 
@@ -67,5 +69,21 @@ public class MainFrame extends JFrame {
     tb.add(new JButton(controller.getAddNetworkAction()));
 
     return tb;
+  }
+
+  private class ChatsSelectionListener implements TreeSelectionListener {
+    public void valueChanged(TreeSelectionEvent e) {
+      Object selected = chatsTree.getLastSelectedPathComponent();
+      if (selected instanceof MessageLog log) {
+        messageList.setModel(log.getMessageList());
+        messageField.getAccessibleContext().setAccessibleName("Message to " +
+                                                              log.getLogName());
+        setTitle(log.getLogName() + " - Jirc");
+      } else {
+        messageList.setModel(null);
+        messageField.getAccessibleContext().setAccessibleName("Message");
+        setTitle("Jirc");
+      }
+    }
   }
 }
