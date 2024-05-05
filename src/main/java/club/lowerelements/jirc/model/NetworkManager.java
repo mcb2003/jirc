@@ -15,9 +15,8 @@ public class NetworkManager implements TreeModel {
   public void addNetwork(Network n) {
     n.addNetworkListener(networkListener);
     networks.add(n);
-    n.connect();
-
     fireTreeNodesInsertedEvent(n, networks.size() - 1);
+    n.connect();
   }
 
   public void fireTreeNodesInsertedEvent(Network n, int index) {
@@ -100,6 +99,15 @@ public class NetworkManager implements TreeModel {
   class NetworkListener implements Network.Listener {
     @Override
     public void nameChanged(Network.NameChangedEvent e) {
+      Network n = e.getNetwork();
+      int index = networks.indexOf(n);
+      if (index != -1) {
+        fireTreeNodesChangedEvent(n, index);
+      }
+    }
+
+    @Override
+    public void statusChanged(Network.StatusChangedEvent e) {
       Network n = e.getNetwork();
       int index = networks.indexOf(n);
       if (index != -1) {
