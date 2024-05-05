@@ -17,13 +17,36 @@ public class NetworkManager implements TreeModel {
     networks.add(n);
     n.connect();
 
-    Object[] path = {getRoot()};
-    int[] indices = {networks.size() - 1};
-    Object[] children = {n};
-    var e = new TreeModelEvent(this, path, indices, children);
+    fireTreeNodesInsertedEvent(n, networks.size() - 1);
+  }
 
+  public void fireTreeNodesInsertedEvent(Network n, int index) {
+    Object[] path = {this};
+    int[] indices = {index};
+    Object[] children = {n};
+    fireTreeNodesInsertedEvent(path, indices, children);
+  }
+
+  public void fireTreeNodesInsertedEvent(Object[] path, int[] indices,
+                                         Object[] children) {
+    var e = new TreeModelEvent(this, path, indices, children);
     for (var l : listeners) {
       l.treeNodesInserted(e);
+    }
+  }
+
+  public void fireTreeNodesChangedEvent(Network n, int index) {
+    Object[] path = {this};
+    int[] indices = {index};
+    Object[] children = {n};
+    fireTreeNodesChangedEvent(path, indices, children);
+  }
+
+  public void fireTreeNodesChangedEvent(Object[] path, int[] indices,
+                                        Object[] children) {
+    var e = new TreeModelEvent(this, path, indices, children);
+    for (var l : listeners) {
+      l.treeNodesChanged(e);
     }
   }
 
@@ -79,15 +102,8 @@ public class NetworkManager implements TreeModel {
     public void nameChanged(Network.NameChangedEvent e) {
       Network n = e.getNetwork();
       int index = networks.indexOf(n);
-      if (index == -1) {
-        return;
-      }
-      Object[] path = {NetworkManager.this};
-      int[] indices = {index};
-      Object[] children = {n};
-      var ev = new TreeModelEvent(NetworkManager.this, path, indices, children);
-      for (var l : listeners) {
-        l.treeNodesChanged(ev);
+      if (index != -1) {
+        fireTreeNodesChangedEvent(n, index);
       }
     }
   }
