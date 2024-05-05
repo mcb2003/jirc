@@ -3,7 +3,7 @@ package club.lowerelements.jirc;
 public class NetworkInfo {
   public String host;
   public short port;
-  public Boolean tls;
+  public boolean tls;
   public String nick, user, realName;
 
   @Override

@@ -6,6 +6,10 @@ import java.util.*;
 import javax.swing.*;
 
 public class Controller {
+  // Models:
+  private NetworkManager networks = new NetworkManager();
+
+  // Views:
   private Set<MainFrame> windows = new HashSet<>();
 
   // Actions and other listeners:
@@ -13,6 +17,8 @@ public class Controller {
   private Action exitAction = new ExitAction();
   private Action newWindowAction = new NewWindowAction();
   private Action addNetworkAction = new AddNetworkAction();
+
+  NetworkManager getNetworkManager() { return networks; }
 
   Action getExitAction() { return exitAction; }
 
@@ -81,8 +87,8 @@ public class Controller {
       dlg.addNetworkListener(new NetworkDialog.Listener() {
         @Override
         public void networkAdded(NetworkDialog.AddEvent e) {
-          System.out.println("Network added!");
-          System.out.println(e.getNetworkInfo());
+          var network = new Network(e.getNetworkInfo());
+          networks.addNetwork(network);
         }
       });
       dlg.setVisible(true);
