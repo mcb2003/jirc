@@ -1,0 +1,16 @@
+#!/bin/bash
+
+function cleanup() {
+    rm "$DEPSFILE"
+    exit 0
+}
+
+DEPSFILE="$(mktemp -t depsXXXXXXXX.txt)"
+trap cleanup 1 2 15
+
+mvn -q dependency:list -DoutputAbsoluteArtifactFilename=true -DoutputScope=false -DoutputFile="$DEPSFILE"
+CLASSPATH="target/classes:/usr/share/java/java-atk-wrapper.jar"
+CLASSPATH="$CLASSPATH:$(cut -d: -f6 "$DEPSFILE" | cut -d "$(printf '\x1b')" -f1 | grep -v '^$' | tr '\n' ':')"
+rm "$DEPSFILE"
+export CLASSPATH
+exec java club.lowerelements.jirc.App "$@"
