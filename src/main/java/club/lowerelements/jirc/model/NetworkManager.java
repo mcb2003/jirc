@@ -7,10 +7,15 @@ import javax.swing.tree.*;
 
 public class NetworkManager implements TreeModel {
   private List<Network> networks = new ArrayList<>();
+
+  // Listeners:
   private List<TreeModelListener> listeners = new ArrayList<>();
+  private NetworkListener networkListener = new NetworkListener();
 
   public void addNetwork(Network n) {
+    n.addNetworkListener(networkListener);
     networks.add(n);
+    n.connect();
 
     Object[] path = {getRoot()};
     int[] indices = {networks.size() - 1};
@@ -68,4 +73,22 @@ public class NetworkManager implements TreeModel {
 
   @Override
   public void valueForPathChanged(TreePath path, Object newValue) {}
+
+  class NetworkListener implements Network.Listener {
+    @Override
+    public void nameChanged(Network.NameChangedEvent e) {
+      Network n = e.getNetwork();
+      int index = networks.indexOf(n);
+      if (index == -1) {
+        return;
+      }
+      Object[] path = {NetworkManager.this};
+      int[] indices = {index};
+      Object[] children = {n};
+      var ev = new TreeModelEvent(NetworkManager.this, path, indices, children);
+      for (var l : listeners) {
+        l.treeNodesChanged(ev);
+      }
+    }
+  }
 }
