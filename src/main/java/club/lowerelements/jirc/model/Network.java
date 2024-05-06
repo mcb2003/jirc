@@ -1,16 +1,7 @@
 package club.lowerelements.jirc;
 
 import java.util.*;
-import net.engio.mbassy.bus.common.DeadMessage;
-import net.engio.mbassy.listener.Handler;
 import org.kitteh.irc.client.library.Client;
-import org.kitteh.irc.client.library.element.ISupportParameter;
-import org.kitteh.irc.client.library.event.client.ClientNegotiationCompleteEvent;
-import org.kitteh.irc.client.library.event.client.ClientReceiveMotdEvent;
-import org.kitteh.irc.client.library.event.client.ISupportParameterEvent;
-import org.kitteh.irc.client.library.event.connection.ClientConnectionEndedEvent;
-import org.kitteh.irc.client.library.event.connection.ClientConnectionEstablishedEvent;
-import org.kitteh.irc.client.library.event.user.ServerNoticeEvent;
 
 public class Network implements MessageLog {
   private Client client;
@@ -22,13 +13,14 @@ public class Network implements MessageLog {
   private List<MessageLog> chats = new ArrayList<>();
 
   private Set<Listener> listeners = new HashSet<>();
+  private NetworkEventHandler handler = new NetworkEventHandler(this);
 
   public Network(NetworkInfo ni) {
     info = ni;
     name = ni.host;
 
     client = ni.getClientBuilder().build();
-    client.getEventManager().registerEventListener(this);
+    client.getEventManager().registerEventListener(handler);
   }
 
   public void connect() {
@@ -42,6 +34,14 @@ public class Network implements MessageLog {
   }
 
   public NetworkInfo getNetworkInfo() { return info; }
+
+  public String getName() { return name; }
+
+  public void setName(String newName) {
+    String oldName = name;
+    name = newName;
+    fireNameChangedEvent(oldName, newName);
+  }
 
   @Override
   public String getLogName() {
@@ -76,55 +76,11 @@ public class Network implements MessageLog {
   public void addNetworkListener(Listener l) { listeners.add(l); }
   public void removeNetworkListener(Listener l) { listeners.remove(l); }
 
-  public void fireNameChangedEvent(String oldName, String newName) {
+  void fireNameChangedEvent(String oldName, String newName) {
     var e = new NameChangedEvent(oldName, newName);
     for (var l : listeners) {
       l.nameChanged(e);
     }
-  }
-
-  @Handler
-  public void onConnected(ClientConnectionEstablishedEvent e) {
-    setStatus(Status.NEGOTIATING);
-  }
-
-  @Handler
-  public void onNegotiationComplete(ClientNegotiationCompleteEvent e) {
-    setStatus(Status.CONNECTED);
-  }
-
-  @Handler
-  public void onDisconnected(ClientConnectionEndedEvent e) {
-    setStatus(Status.DISCONNECTED);
-  }
-
-  @Handler
-  public void onISupportParam(ISupportParameterEvent e) {
-    // If this is a network name, fire the NameChangedEvent
-    if (e.getParameter() instanceof ISupportParameter.Network param) {
-      String oldName = name;
-      name = param.getNetworkName();
-      fireNameChangedEvent(oldName, name);
-    }
-  }
-
-  @Handler
-  public void onServerNotice(ServerNoticeEvent e) {
-    serverMessages.addMessage(new Message(e.getMessage()));
-  }
-
-  @Handler
-  public void onMotd(ClientReceiveMotdEvent e) {
-    Optional<List<String>> motd = e.getMotd();
-    motd.ifPresent(msgs -> {
-      serverMessages.addMessages(msgs.stream().map(Message::new));
-    });
-  }
-
-  @Handler
-  public void onDeadMessage(DeadMessage msg) {
-    Object o = msg.getMessage();
-    System.err.println("Didn't handle: " + o);
   }
 
   public class StatusChangedEvent extends EventObject {
