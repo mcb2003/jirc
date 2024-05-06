@@ -20,7 +20,7 @@ public class MainFrame extends JFrame {
     setJMenuBar(makeMenuBar(controller));
     add(makeToolBar(controller), BorderLayout.NORTH);
 
-    chatsTree = new JTree(controller.getNetworkManager());
+    chatsTree = new JTree(controller.getNetworkManager().getModel());
     chatsTree.getAccessibleContext().setAccessibleName("Channels");
     chatsTree.setRootVisible(false);
     chatsTree.addTreeSelectionListener(new ChatsSelectionListener());

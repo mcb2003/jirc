@@ -19,6 +19,7 @@ public class Network implements MessageLog {
   private NetworkInfo info;
   private String name;
   private MessageList serverMessages = new MessageList();
+  private List<MessageLog> chats = new ArrayList<>();
 
   private Set<Listener> listeners = new HashSet<>();
 
@@ -65,6 +66,12 @@ public class Network implements MessageLog {
       l.statusChanged(e);
     }
   }
+
+  MessageLog getChat(int index) { return chats.get(index); }
+
+  public int getChatCount() { return chats.size(); }
+
+  public int getChatIndex(MessageLog l) { return chats.indexOf(l); }
 
   public void addNetworkListener(Listener l) { listeners.add(l); }
   public void removeNetworkListener(Listener l) { listeners.remove(l); }

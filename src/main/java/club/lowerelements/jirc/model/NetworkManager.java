@@ -5,96 +5,29 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.*;
 
-public class NetworkManager implements TreeModel {
+public class NetworkManager {
   private List<Network> networks = new ArrayList<>();
+  private ChatsModel model;
 
   // Listeners:
-  private List<TreeModelListener> listeners = new ArrayList<>();
   private NetworkListener networkListener = new NetworkListener();
+
+  public NetworkManager() { this.model = new ChatsModel(this); }
+
+  public ChatsModel getModel() { return model; }
+
+  public Network getNetwork(int index) { return networks.get(index); }
+
+  public int getNetworkCount() { return networks.size(); }
+
+  public int getNetworkIndex(Network n) { return networks.indexOf(n); }
 
   public void addNetwork(Network n) {
     n.addNetworkListener(networkListener);
     networks.add(n);
-    fireTreeNodesInsertedEvent(n, networks.size() - 1);
+    model.fireTreeNodesInsertedEvent(n, networks.size() - 1);
     n.connect();
   }
-
-  public void fireTreeNodesInsertedEvent(Network n, int index) {
-    Object[] path = {this};
-    int[] indices = {index};
-    Object[] children = {n};
-    fireTreeNodesInsertedEvent(path, indices, children);
-  }
-
-  public void fireTreeNodesInsertedEvent(Object[] path, int[] indices,
-                                         Object[] children) {
-    var e = new TreeModelEvent(this, path, indices, children);
-    for (var l : listeners) {
-      l.treeNodesInserted(e);
-    }
-  }
-
-  public void fireTreeNodesChangedEvent(Network n, int index) {
-    Object[] path = {this};
-    int[] indices = {index};
-    Object[] children = {n};
-    fireTreeNodesChangedEvent(path, indices, children);
-  }
-
-  public void fireTreeNodesChangedEvent(Object[] path, int[] indices,
-                                        Object[] children) {
-    var e = new TreeModelEvent(this, path, indices, children);
-    for (var l : listeners) {
-      l.treeNodesChanged(e);
-    }
-  }
-
-  @Override
-  public void addTreeModelListener(TreeModelListener l) {
-    listeners.add(l);
-  }
-
-  @Override
-  public void removeTreeModelListener(TreeModelListener l) {
-    listeners.remove(l);
-  }
-
-  @Override
-  public Object getChild(Object parent, int index) {
-    if (parent instanceof NetworkManager mgr) {
-      return mgr.networks.get(index);
-    }
-    return null;
-  }
-
-  @Override
-  public int getChildCount(Object parent) {
-    if (parent instanceof NetworkManager mgr) {
-      return mgr.networks.size();
-    }
-    return 0;
-  }
-
-  @Override
-  public int getIndexOfChild(Object parent, Object child) {
-    if (parent instanceof NetworkManager mgr) {
-      return mgr.networks.indexOf((Network)child);
-    }
-    return -1;
-  }
-
-  @Override
-  public Object getRoot() {
-    return this;
-  }
-
-  @Override
-  public boolean isLeaf(Object node) {
-    return !(node instanceof NetworkManager || node instanceof Network);
-  }
-
-  @Override
-  public void valueForPathChanged(TreePath path, Object newValue) {}
 
   class NetworkListener implements Network.Listener {
     @Override
@@ -102,7 +35,7 @@ public class NetworkManager implements TreeModel {
       Network n = e.getNetwork();
       int index = networks.indexOf(n);
       if (index != -1) {
-        fireTreeNodesChangedEvent(n, index);
+        model.fireTreeNodesChangedEvent(n, index);
       }
     }
 
@@ -111,7 +44,7 @@ public class NetworkManager implements TreeModel {
       Network n = e.getNetwork();
       int index = networks.indexOf(n);
       if (index != -1) {
-        fireTreeNodesChangedEvent(n, index);
+        model.fireTreeNodesChangedEvent(n, index);
       }
     }
   }
