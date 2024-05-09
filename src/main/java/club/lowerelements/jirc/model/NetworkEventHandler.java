@@ -1,6 +1,7 @@
 package club.lowerelements.jirc;
 
 import club.lowerelements.jirc.Network.Status;
+import java.time.Instant;
 import java.util.*;
 import net.engio.mbassy.bus.common.DeadMessage;
 import net.engio.mbassy.listener.Handler;
@@ -43,14 +44,16 @@ public class NetworkEventHandler {
 
   @Handler
   public void onServerNotice(ServerNoticeEvent e) {
-    network.getMessageList().addMessage(new Message(e.getMessage()));
+    network.getMessageList().addMessage(new GenericMessage(e.getMessage()));
   }
 
   @Handler
   public void onMotd(ClientReceiveMotdEvent e) {
+    Instant ts = Instant.now();
     Optional<List<String>> motd = e.getMotd();
     motd.ifPresent(msgs -> {
-      network.getMessageList().addMessages(msgs.stream().map(Message::new));
+      network.getMessageList().addMessages(
+          msgs.stream().map(m -> new GenericMessage(ts, m)));
     });
   }
 
@@ -59,7 +62,7 @@ public class NetworkEventHandler {
     var channel = network.getOrAddChat(e.getChannel());
     String joinMessage = String.format("%s joined %s", e.getUser().getNick(),
                                        e.getChannel().getName());
-    channel.getMessageList().addMessage(new Message(joinMessage));
+    channel.getMessageList().addMessage(new GenericMessage(joinMessage));
   }
 
   @Handler

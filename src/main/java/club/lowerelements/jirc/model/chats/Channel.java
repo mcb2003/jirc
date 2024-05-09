@@ -32,6 +32,6 @@ public class Channel extends AbstractChat {
     if (e instanceof ChannelNoticeEvent) {
       msg = "[Notice] " + msg;
     }
-    messages.addMessage(new Message(msg));
+    messages.addMessage(new GenericMessage(msg));
   }
 }
