@@ -44,7 +44,8 @@ public class NetworkEventHandler {
 
   @Handler
   public void onServerNotice(ServerNoticeEvent e) {
-    network.getMessageList().addMessage(new GenericMessage(e.getMessage()));
+    network.getMessageList().addMessage(
+        new NoticeMessage(null, e.getMessage()));
   }
 
   @Handler

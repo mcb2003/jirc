@@ -28,10 +28,10 @@ public class Channel extends AbstractChat {
     if (!e.getChannel().equals(channel)) {
       return; // Not our channel
     }
-    var msg = String.format("%s: %s", e.getActor().getNick(), e.getMessage());
     if (e instanceof ChannelNoticeEvent) {
-      msg = "[Notice] " + msg;
+      messages.addMessage(new NoticeMessage(e.getActor(), e.getMessage()));
+    } else {
+      messages.addMessage(new PrivMessage(e.getActor(), e.getMessage()));
     }
-    messages.addMessage(new GenericMessage(msg));
   }
 }
