@@ -75,11 +75,11 @@ public class MainFrame extends JFrame {
   private class ChatsSelectionListener implements TreeSelectionListener {
     public void valueChanged(TreeSelectionEvent e) {
       Object selected = chatsTree.getLastSelectedPathComponent();
-      if (selected instanceof MessageLog log) {
+      if (selected instanceof Chat log) {
         messageList.setModel(log.getMessageList());
         messageField.getAccessibleContext().setAccessibleName("Message to " +
-                                                              log.getLogName());
-        setTitle(log.getLogName() + " - Jirc");
+                                                              log.getChatName());
+        setTitle(log.getChatName() + " - Jirc");
         messageField.setEditable(!log.isLogReadOnly());
         if (log.isLogReadOnly()) {
           messageField.setText("Chat is read-only");

@@ -6,7 +6,7 @@ import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.abstractbase.ActorChannelMessageEventBase;
 import org.kitteh.irc.client.library.event.channel.ChannelNoticeEvent;
 
-public class Channel implements MessageLog {
+public class Channel implements Chat {
   private org.kitteh.irc.client.library.element.Channel channel;
   private MessageList messages = new MessageList();
 
@@ -25,7 +25,7 @@ public class Channel implements MessageLog {
   }
 
   @Override
-  public String getLogName() {
+  public String getChatName() {
     return channel.getName();
   }
 

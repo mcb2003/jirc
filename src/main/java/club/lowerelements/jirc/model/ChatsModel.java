@@ -18,7 +18,7 @@ public class ChatsModel implements TreeModel {
     fireTreeNodesInsertedEvent(path, indices, children);
   }
 
-  void fireTreeNodesInsertedEvent(Network n, MessageLog l, int index) {
+  void fireTreeNodesInsertedEvent(Network n, Chat l, int index) {
     Object[] path = {root, n};
     int[] indices = {index};
     Object[] children = {l};
@@ -83,7 +83,7 @@ public class ChatsModel implements TreeModel {
     if (parent instanceof NetworkManager mgr) {
       return mgr.getNetworkIndex((Network)child);
     } else if (parent instanceof Network net) {
-      return net.getChatIndex((MessageLog)child);
+      return net.getChatIndex((Chat)child);
     }
     return -1;
   }

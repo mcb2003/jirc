@@ -51,7 +51,7 @@ public class NetworkManager {
     @Override
     public void chatAdded(Network.ChatAddedEvent e) {
       Network n = e.getNetwork();
-      MessageLog l = e.getChat();
+      Chat l = e.getChat();
       int index = e.getIndex();
       model.fireTreeNodesInsertedEvent(n, l, index);
     }

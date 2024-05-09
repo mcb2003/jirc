@@ -3,14 +3,14 @@ package club.lowerelements.jirc;
 import java.util.*;
 import org.kitteh.irc.client.library.Client;
 
-public class Network implements MessageLog {
+public class Network implements Chat {
   private Client client;
   private Status status = Status.DISCONNECTED;
 
   private NetworkInfo info;
   private String name;
   private MessageList serverMessages = new MessageList();
-  private List<MessageLog> chats = new ArrayList<>();
+  private List<Chat> chats = new ArrayList<>();
 
   private Set<Listener> listeners = new HashSet<>();
   private NetworkEventHandler handler = new NetworkEventHandler(this);
@@ -44,7 +44,7 @@ public class Network implements MessageLog {
   }
 
   @Override
-  public String getLogName() {
+  public String getChatName() {
     return name;
   }
   @Override
@@ -67,14 +67,14 @@ public class Network implements MessageLog {
     }
   }
 
-  public void addChat(MessageLog l) {
+  public void addChat(Chat l) {
     chats.add(l);
     fireChatAddedEvent(l, chats.size() - 1);
   }
 
   public Channel
   getOrAddChat(org.kitteh.irc.client.library.element.Channel chan) {
-    Optional<MessageLog> found =
+    Optional<Chat> found =
         chats.stream()
             .filter(c
                     -> c instanceof Channel &&
@@ -88,11 +88,11 @@ public class Network implements MessageLog {
     return channel;
   }
 
-  MessageLog getChat(int index) { return chats.get(index); }
+  Chat getChat(int index) { return chats.get(index); }
 
   public int getChatCount() { return chats.size(); }
 
-  public int getChatIndex(MessageLog l) { return chats.indexOf(l); }
+  public int getChatIndex(Chat l) { return chats.indexOf(l); }
 
   public void addNetworkListener(Listener l) { listeners.add(l); }
   public void removeNetworkListener(Listener l) { listeners.remove(l); }
@@ -104,7 +104,7 @@ public class Network implements MessageLog {
     }
   }
 
-  public void fireChatAddedEvent(MessageLog chat, int index) {
+  public void fireChatAddedEvent(Chat chat, int index) {
     var e = new ChatAddedEvent(chat, index);
     for (var l : listeners) {
       l.chatAdded(e);
@@ -140,17 +140,17 @@ public class Network implements MessageLog {
   }
 
   public class ChatAddedEvent extends EventObject {
-    private MessageLog chat;
+    private Chat chat;
     private int index;
 
-    public ChatAddedEvent(MessageLog chat, int index) {
+    public ChatAddedEvent(Chat chat, int index) {
       super(Network.this);
       this.chat = chat;
       this.index = index;
     }
 
     public Network getNetwork() { return Network.this; }
-    public MessageLog getChat() { return chat; }
+    public Chat getChat() { return chat; }
     public int getIndex() { return index; }
   }
 
