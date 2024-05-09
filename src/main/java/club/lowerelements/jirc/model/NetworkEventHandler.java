@@ -5,6 +5,7 @@ import java.util.*;
 import net.engio.mbassy.bus.common.DeadMessage;
 import net.engio.mbassy.listener.Handler;
 import org.kitteh.irc.client.library.element.ISupportParameter;
+import org.kitteh.irc.client.library.event.channel.ChannelJoinEvent;
 import org.kitteh.irc.client.library.event.client.ClientNegotiationCompleteEvent;
 import org.kitteh.irc.client.library.event.client.ClientReceiveMotdEvent;
 import org.kitteh.irc.client.library.event.client.ISupportParameterEvent;
@@ -51,6 +52,14 @@ public class NetworkEventHandler {
     motd.ifPresent(msgs -> {
       network.getMessageList().addMessages(msgs.stream().map(Message::new));
     });
+  }
+
+  @Handler
+  public void onJoin(ChannelJoinEvent e) {
+    var channel = network.getOrAddChat(e.getChannel());
+    String joinMessage = String.format("%s joined %s", e.getUser().getNick(),
+                                       e.getChannel().getName());
+    channel.getMessageList().addMessage(new Message(joinMessage));
   }
 
   @Handler

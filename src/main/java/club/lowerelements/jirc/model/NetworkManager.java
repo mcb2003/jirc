@@ -47,5 +47,13 @@ public class NetworkManager {
         model.fireTreeNodesChangedEvent(n, index);
       }
     }
+
+    @Override
+    public void chatAdded(Network.ChatAddedEvent e) {
+      Network n = e.getNetwork();
+      MessageLog l = e.getChat();
+      int index = e.getIndex();
+      model.fireTreeNodesInsertedEvent(n, l, index);
+    }
   }
 }

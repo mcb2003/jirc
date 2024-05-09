@@ -18,6 +18,13 @@ public class ChatsModel implements TreeModel {
     fireTreeNodesInsertedEvent(path, indices, children);
   }
 
+  void fireTreeNodesInsertedEvent(Network n, MessageLog l, int index) {
+    Object[] path = {root, n};
+    int[] indices = {index};
+    Object[] children = {l};
+    fireTreeNodesInsertedEvent(path, indices, children);
+  }
+
   void fireTreeNodesInsertedEvent(Object[] path, int[] indices,
                                   Object[] children) {
     var e = new TreeModelEvent(this, path, indices, children);

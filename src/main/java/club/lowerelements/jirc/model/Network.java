@@ -67,6 +67,27 @@ public class Network implements MessageLog {
     }
   }
 
+  public void addChat(MessageLog l) {
+    chats.add(l);
+    fireChatAddedEvent(l, chats.size() - 1);
+  }
+
+  public Channel
+  getOrAddChat(org.kitteh.irc.client.library.element.Channel chan) {
+    Optional<MessageLog> found =
+        chats.stream()
+            .filter(c
+                    -> c instanceof Channel &&
+                           ((Channel)c).getChannel().equals(chan))
+            .findAny();
+    if (found.isPresent()) {
+      return (Channel)found.get();
+    }
+    var channel = new Channel(chan);
+    addChat(channel);
+    return channel;
+  }
+
   MessageLog getChat(int index) { return chats.get(index); }
 
   public int getChatCount() { return chats.size(); }
@@ -80,6 +101,13 @@ public class Network implements MessageLog {
     var e = new NameChangedEvent(oldName, newName);
     for (var l : listeners) {
       l.nameChanged(e);
+    }
+  }
+
+  public void fireChatAddedEvent(MessageLog chat, int index) {
+    var e = new ChatAddedEvent(chat, index);
+    for (var l : listeners) {
+      l.chatAdded(e);
     }
   }
 
@@ -111,10 +139,26 @@ public class Network implements MessageLog {
     public String getNewName() { return newName; }
   }
 
+  public class ChatAddedEvent extends EventObject {
+    private MessageLog chat;
+    private int index;
+
+    public ChatAddedEvent(MessageLog chat, int index) {
+      super(Network.this);
+      this.chat = chat;
+      this.index = index;
+    }
+
+    public Network getNetwork() { return Network.this; }
+    public MessageLog getChat() { return chat; }
+    public int getIndex() { return index; }
+  }
+
   public enum Status { DISCONNECTED, CONNECTING, NEGOTIATING, CONNECTED }
 
   public interface Listener extends EventListener {
     public default void nameChanged(NameChangedEvent e) {}
     public default void statusChanged(StatusChangedEvent e) {}
+    public default void chatAdded(ChatAddedEvent e) {}
   }
 }
