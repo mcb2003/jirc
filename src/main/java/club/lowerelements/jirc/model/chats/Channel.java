@@ -6,9 +6,8 @@ import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.abstractbase.ActorChannelMessageEventBase;
 import org.kitteh.irc.client.library.event.channel.ChannelNoticeEvent;
 
-public class Channel implements Chat {
+public class Channel extends AbstractChat {
   private org.kitteh.irc.client.library.element.Channel channel;
-  private MessageList messages = new MessageList();
 
   public Channel(org.kitteh.irc.client.library.element.Channel channel) {
     this.channel = channel;
@@ -20,18 +19,8 @@ public class Channel implements Chat {
   }
 
   @Override
-  public String toString() {
-    return channel.getName();
-  }
-
-  @Override
   public String getChatName() {
     return channel.getName();
-  }
-
-  @Override
-  public MessageList getMessageList() {
-    return messages;
   }
 
   @Handler
