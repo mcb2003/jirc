@@ -2,11 +2,12 @@ package club.lowerelements.jirc;
 
 import java.util.*;
 import net.engio.mbassy.listener.Handler;
+import org.kitteh.irc.client.library.element.MessageReceiver;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.abstractbase.ActorChannelMessageEventBase;
 import org.kitteh.irc.client.library.event.channel.ChannelNoticeEvent;
 
-public class Channel extends AbstractChat {
+public class Channel extends AbstractChat implements Messageable {
   private org.kitteh.irc.client.library.element.Channel channel;
 
   public Channel(org.kitteh.irc.client.library.element.Channel channel) {
@@ -22,6 +23,9 @@ public class Channel extends AbstractChat {
   public String getChatName() {
     return channel.getName();
   }
+
+  @Override
+  public MessageReceiver getMessageReceiver() { return channel; }
 
   @Handler
   public void onMessage(ActorChannelMessageEventBase<User> e) {

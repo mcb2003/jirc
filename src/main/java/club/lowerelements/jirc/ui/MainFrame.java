@@ -34,6 +34,7 @@ public class MainFrame extends JFrame {
     messageField = new JTextField();
     messageField.setEditable(false);
     messageField.getAccessibleContext().setAccessibleName("Message");
+    messageField.addActionListener(controller.getMessageSendHandler());
     messagePanel.add(messageField, BorderLayout.PAGE_END);
 
     var splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
@@ -71,6 +72,12 @@ public class MainFrame extends JFrame {
 
     return tb;
   }
+
+  public static MainFrame fromChild(Component component) {
+      return (MainFrame)SwingUtilities.getWindowAncestor(component);
+  }
+
+  public Object getSelectedChat() { return chatsTree.getLastSelectedPathComponent(); }
 
   private class ChatsSelectionListener implements TreeSelectionListener {
     public void valueChanged(TreeSelectionEvent e) {

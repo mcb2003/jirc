@@ -48,6 +48,21 @@ public class ChatsModel implements TreeModel {
     }
   }
 
+  void fireTreeNodesRemovedEvent(Network n, int index) {
+    Object[] path = {root};
+    int[] indices = {index};
+    Object[] children = {n};
+    fireTreeNodesRemovedEvent(path, indices, children);
+  }
+
+  void fireTreeNodesRemovedEvent(Object[] path, int[] indices,
+                                  Object[] children) {
+    var e = new TreeModelEvent(this, path, indices, children);
+    for (var l : listeners) {
+      l.treeNodesRemoved(e);
+    }
+  }
+
   @Override
   public void addTreeModelListener(TreeModelListener l) {
     listeners.add(l);

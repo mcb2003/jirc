@@ -14,11 +14,15 @@ public class Controller {
 
   // Actions and other listeners:
   private WindowHandler windowAdapter = new WindowHandler();
+  private ActionListener messageSendHandler = new MessageSendHandler();
+
   private Action exitAction = new ExitAction();
   private Action newWindowAction = new NewWindowAction();
   private Action addNetworkAction = new AddNetworkAction();
 
   NetworkManager getNetworkManager() { return networks; }
+
+  public ActionListener getMessageSendHandler() { return messageSendHandler; }
 
 public void shutdown() {
     networks.shutdown();
@@ -101,4 +105,19 @@ public void shutdown() {
       dlg.setVisible(true);
     }
   }
+
+private class MessageSendHandler implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        var messageField = (JTextField)e.getSource();
+        var msg = messageField.getText();
+        var frame = MainFrame.fromChild(messageField);
+        Object selected = frame.getSelectedChat();
+        if (selected instanceof Messageable chat) {
+            chat.getMessageReceiver().sendMessage(msg);
+            messageField.setText("");
+        }
+            messageField.requestFocusInWindow();
+    }
+}
 }
