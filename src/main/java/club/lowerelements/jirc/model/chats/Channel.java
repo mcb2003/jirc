@@ -5,7 +5,7 @@ import net.engio.mbassy.listener.Handler;
 import org.kitteh.irc.client.library.element.MessageReceiver;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.abstractbase.ActorChannelMessageEventBase;
-import org.kitteh.irc.client.library.event.channel.ChannelNoticeEvent;
+import org.kitteh.irc.client.library.event.channel.*;
 
 public class Channel extends AbstractChat implements Messageable {
   private org.kitteh.irc.client.library.element.Channel channel;
@@ -38,6 +38,8 @@ public class Channel extends AbstractChat implements Messageable {
     }
     if (e instanceof ChannelNoticeEvent) {
       messages.addMessage(new NoticeMessage(e.getActor(), e.getMessage()));
+    } else if (e instanceof ChannelCtcpEvent) {
+      messages.addMessage(new CtcpMessage(e.getActor(), e.getMessage()));
     } else {
       messages.addMessage(new PrivMessage(e.getActor(), e.getMessage()));
     }
