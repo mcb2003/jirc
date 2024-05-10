@@ -54,7 +54,7 @@ public class Network implements Chat {
     return name;
   }
   @Override
-  public boolean isLogReadOnly() {
+  public boolean isChatReadOnly() {
     return true;
   }
   @Override

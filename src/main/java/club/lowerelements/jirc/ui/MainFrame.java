@@ -87,8 +87,8 @@ public class MainFrame extends JFrame {
         messageField.getAccessibleContext().setAccessibleName("Message to " +
                                                               log.getChatName());
         setTitle(log.getChatName() + " - Jirc");
-        messageField.setEditable(!log.isLogReadOnly());
-        if (log.isLogReadOnly()) {
+        messageField.setEditable(!log.isChatReadOnly());
+        if (log.isChatReadOnly()) {
           messageField.setText("Chat is read-only");
         } else {
           messageField.setText("");
