@@ -5,13 +5,15 @@ import java.time.Instant;
 import java.util.*;
 import net.engio.mbassy.bus.common.DeadMessage;
 import net.engio.mbassy.listener.Handler;
-import org.kitteh.irc.client.library.element.ISupportParameter;
+import org.kitteh.irc.client.library.element.*;
+import org.kitteh.irc.client.library.event.capabilities.*;
 import org.kitteh.irc.client.library.event.channel.ChannelJoinEvent;
 import org.kitteh.irc.client.library.event.client.ClientNegotiationCompleteEvent;
 import org.kitteh.irc.client.library.event.client.ClientReceiveMotdEvent;
 import org.kitteh.irc.client.library.event.client.ISupportParameterEvent;
 import org.kitteh.irc.client.library.event.connection.ClientConnectionEndedEvent;
 import org.kitteh.irc.client.library.event.connection.ClientConnectionEstablishedEvent;
+import org.kitteh.irc.client.library.event.helper.CapabilityNegotiationRequestEvent;
 import org.kitteh.irc.client.library.event.user.ServerNoticeEvent;
 
 public class NetworkEventHandler {
@@ -22,6 +24,27 @@ public class NetworkEventHandler {
   @Handler
   public void onConnected(ClientConnectionEstablishedEvent e) {
     network.setStatus(Status.NEGOTIATING);
+  }
+
+  @Handler
+  public void supportedCapabilities(CapabilitiesSupportedListEvent e) {
+      requestCapabilities(e, e.getSupportedCapabilities());
+  }
+
+  @Handler
+  public void newCapabilities(CapabilitiesNewSupportedEvent e) {
+      requestCapabilities(e, e.getNewCapabilities());
+  }
+
+  public void requestCapabilities(CapabilityNegotiationRequestEvent e, List<CapabilityState> supported) {
+      // Request the caps we want, based on what's supported
+      String[] wanted = {"echo-message", "invite-notify"};
+      for (var cap : supported) {
+          String name = cap.getName();
+          if (Arrays.stream(wanted).anyMatch(name::equals)) {
+              e.addRequest(name);
+          }
+      }
   }
 
   @Handler

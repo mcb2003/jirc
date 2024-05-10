@@ -25,6 +25,7 @@ public class Network implements Chat {
 
   public void connect() {
     client.connect();
+    client.addChannel("#blindcomputing");
     setStatus(status.CONNECTING);
   }
 
