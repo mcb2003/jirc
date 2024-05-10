@@ -87,7 +87,7 @@ public class MainFrame extends JFrame {
           messageField.setText("");
         }
       } else {
-        messageList.setModel(null);
+        messageList.setModel(new DefaultListModel());
         setTitle("Jirc");
         messageField.setEditable(false);
         messageField.setText("Chat is read-only");

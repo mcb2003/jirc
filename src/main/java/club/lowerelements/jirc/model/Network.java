@@ -28,6 +28,11 @@ public class Network implements Chat {
     setStatus(status.CONNECTING);
   }
 
+  public void disconnect() {
+      client.shutdown();
+    setStatus(status.DISCONNECTING);
+  }
+
   @Override
   public String toString() {
     return String.format("%s (%s)", name, status);
@@ -154,7 +159,7 @@ public class Network implements Chat {
     public int getIndex() { return index; }
   }
 
-  public enum Status { DISCONNECTED, CONNECTING, NEGOTIATING, CONNECTED }
+  public enum Status { DISCONNECTED, CONNECTING, NEGOTIATING, CONNECTED, DISCONNECTING }
 
   public interface Listener extends EventListener {
     public default void nameChanged(NameChangedEvent e) {}

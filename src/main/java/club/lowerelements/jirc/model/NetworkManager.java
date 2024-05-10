@@ -29,6 +29,16 @@ public class NetworkManager {
     n.connect();
   }
 
+  public void shutdown() {
+      var iter = networks.listIterator();
+      while (iter.hasNext()) {
+          var net = iter.next();
+          net.disconnect();
+          iter.remove();
+          model.fireTreeNodesRemovedEvent(net, 0);
+      }
+  }
+
   class NetworkListener implements Network.Listener {
     @Override
     public void nameChanged(Network.NameChangedEvent e) {

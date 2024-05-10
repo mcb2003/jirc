@@ -20,6 +20,10 @@ public class Controller {
 
   NetworkManager getNetworkManager() { return networks; }
 
+public void shutdown() {
+    networks.shutdown();
+}
+
   Action getExitAction() { return exitAction; }
 
   private class ExitAction extends AbstractAction {
@@ -69,6 +73,9 @@ public class Controller {
       // Remove the window from our Set
       var w = (MainFrame)e.getSource();
       windows.remove(w);
+      if (windows.isEmpty()) {
+          shutdown();
+      }
     }
   }
 
