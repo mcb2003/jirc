@@ -23,21 +23,12 @@ public class Network implements Chat {
     client.getEventManager().registerEventListener(handler);
   }
 
-  public void connect() {
-    client.connect();
-    client.addChannel("#blindcomputing");
-    setStatus(status.CONNECTING);
-  }
-
-  public void disconnect() {
-    client.shutdown();
-    setStatus(status.DISCONNECTING);
-  }
-
   @Override
   public String toString() {
     return String.format("%s (%s)", name, status);
   }
+
+  // Property Getters and Setters:
 
   public NetworkInfo getNetworkInfo() { return info; }
 
@@ -49,23 +40,6 @@ public class Network implements Chat {
     fireNameChangedEvent(oldName, newName);
   }
 
-  @Override
-  public String getChatName() {
-    return name;
-  }
-  @Override
-  public boolean isChatReadOnly() {
-    return true;
-  }
-  @Override
-  public MessageList getMessageList() {
-    return serverMessages;
-  }
-  @Override
-  public Network getNetwork() {
-    return this;
-  }
-
   public Status getStatus() { return status; }
 
   public void setStatus(Status newStatus) {
@@ -75,6 +49,25 @@ public class Network implements Chat {
     for (var l : listeners) {
       l.statusChanged(e);
     }
+  }
+
+  Chat getChat(int index) { return chats.get(index); }
+
+  public int getChatCount() { return chats.size(); }
+
+  public int getChatIndex(Chat l) { return chats.indexOf(l); }
+
+  // Operations:
+
+  public void connect() {
+    client.connect();
+    client.addChannel("#blindcomputing");
+    setStatus(status.CONNECTING);
+  }
+
+  public void disconnect() {
+    client.shutdown();
+    setStatus(status.DISCONNECTING);
   }
 
   public void addChat(Chat l) {
@@ -98,14 +91,10 @@ public class Network implements Chat {
     return channel;
   }
 
-  Chat getChat(int index) { return chats.get(index); }
-
-  public int getChatCount() { return chats.size(); }
-
-  public int getChatIndex(Chat l) { return chats.indexOf(l); }
-
   public void addNetworkListener(Listener l) { listeners.add(l); }
   public void removeNetworkListener(Listener l) { listeners.remove(l); }
+
+  // Event Firers:
 
   void fireNameChangedEvent(String oldName, String newName) {
     var e = new NameChangedEvent(oldName, newName);
@@ -114,12 +103,36 @@ public class Network implements Chat {
     }
   }
 
-  public void fireChatAddedEvent(Chat chat, int index) {
+  void fireChatAddedEvent(Chat chat, int index) {
     var e = new ChatAddedEvent(chat, index);
     for (var l : listeners) {
       l.chatAdded(e);
     }
   }
+
+  // Chat Interface Implementation:
+
+  @Override
+  public String getChatName() {
+    return name;
+  }
+
+  @Override
+  public boolean isChatReadOnly() {
+    return true;
+  }
+
+  @Override
+  public MessageList getMessageList() {
+    return serverMessages;
+  }
+
+  @Override
+  public Network getNetwork() {
+    return this;
+  }
+
+  // Helper types:
 
   public class StatusChangedEvent extends EventObject {
     private Status oldStatus, newStatus;
