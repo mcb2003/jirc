@@ -24,9 +24,7 @@ public class Controller {
 
   public ActionListener getMessageSendHandler() { return messageSendHandler; }
 
-public void shutdown() {
-    networks.shutdown();
-}
+  public void shutdown() { networks.shutdown(); }
 
   Action getExitAction() { return exitAction; }
 
@@ -78,7 +76,7 @@ public void shutdown() {
       var w = (MainFrame)e.getSource();
       windows.remove(w);
       if (windows.isEmpty()) {
-          shutdown();
+        shutdown();
       }
     }
   }
@@ -106,18 +104,24 @@ public void shutdown() {
     }
   }
 
-private class MessageSendHandler implements ActionListener {
+  private class MessageSendHandler implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-        var messageField = (JTextField)e.getSource();
-        var msg = messageField.getText();
-        var frame = MainFrame.fromChild(messageField);
-        Object selected = frame.getSelectedChat();
-        if (selected instanceof Messageable chat) {
-            chat.getMessageReceiver().sendMessage(msg);
-            messageField.setText("");
+      var messageField = (JTextField)e.getSource();
+      var msg = messageField.getText();
+      var frame = MainFrame.fromChild(messageField);
+      Object selected = frame.getSelectedChat();
+      if (selected instanceof Messageable chat) {
+        chat.getMessageReceiver().sendMessage(msg);
+        var network = chat.getNetwork();
+        if (!network.isCapabilityEnabled("echo-message")) {
+          var self = network.getClient().getUser().get();
+          var echoedMessage = new PrivMessage(self, msg);
+          chat.getMessageList().addMessage(echoedMessage);
         }
-            messageField.requestFocusInWindow();
+        messageField.setText("");
+      }
+      messageField.requestFocusInWindow();
     }
-}
+  }
 }

@@ -2,8 +2,9 @@ package club.lowerelements.jirc;
 
 import java.util.*;
 import org.kitteh.irc.client.library.Client;
+import org.kitteh.irc.client.library.element.ClientLinked;
 
-public class Network implements Chat {
+public class Network implements Chat, ClientLinked {
   private Client client;
   private Status status = Status.DISCONNECTED;
 
@@ -51,11 +52,23 @@ public class Network implements Chat {
     }
   }
 
+  @Override
+  public Client getClient() {
+    return client;
+  }
+
   Chat getChat(int index) { return chats.get(index); }
 
   public int getChatCount() { return chats.size(); }
 
   public int getChatIndex(Chat l) { return chats.indexOf(l); }
+
+  public boolean isCapabilityEnabled(String capName) {
+    return client.getCapabilityManager()
+        .getCapability(capName)
+        .map(c -> !c.isDisabled())
+        .orElse(false);
+  }
 
   // Operations:
 
