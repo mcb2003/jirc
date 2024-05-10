@@ -2,7 +2,7 @@ package club.lowerelements.jirc;
 
 import java.util.*;
 import org.kitteh.irc.client.library.Client;
-import org.kitteh.irc.client.library.element.ClientLinked;
+import org.kitteh.irc.client.library.element.*;
 
 public class Network implements Chat, ClientLinked {
   private Client client;
@@ -102,6 +102,21 @@ public class Network implements Chat, ClientLinked {
     var channel = new Channel(this, chan);
     addChat(channel);
     return channel;
+  }
+
+  public PrivateChat getOrAddChat(User user) {
+    Optional<Chat> found =
+        chats.stream()
+            .filter(c
+                    -> c instanceof PrivateChat &&
+                           ((PrivateChat)c).getUser().equals(user))
+            .findAny();
+    if (found.isPresent()) {
+      return (PrivateChat)found.get();
+    }
+    var privateChat = new PrivateChat(this, user);
+    addChat(privateChat);
+    return privateChat;
   }
 
   public void addNetworkListener(Listener l) { listeners.add(l); }

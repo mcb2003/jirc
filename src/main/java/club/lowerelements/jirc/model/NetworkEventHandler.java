@@ -6,14 +6,13 @@ import java.util.*;
 import net.engio.mbassy.bus.common.DeadMessage;
 import net.engio.mbassy.listener.Handler;
 import org.kitteh.irc.client.library.element.*;
+import org.kitteh.irc.client.library.event.abstractbase.ActorPrivateMessageEventBase;
 import org.kitteh.irc.client.library.event.capabilities.*;
 import org.kitteh.irc.client.library.event.channel.ChannelJoinEvent;
-import org.kitteh.irc.client.library.event.client.ClientNegotiationCompleteEvent;
-import org.kitteh.irc.client.library.event.client.ClientReceiveMotdEvent;
-import org.kitteh.irc.client.library.event.client.ISupportParameterEvent;
-import org.kitteh.irc.client.library.event.connection.ClientConnectionEndedEvent;
-import org.kitteh.irc.client.library.event.connection.ClientConnectionEstablishedEvent;
+import org.kitteh.irc.client.library.event.client.*;
+import org.kitteh.irc.client.library.event.connection.*;
 import org.kitteh.irc.client.library.event.helper.CapabilityNegotiationRequestEvent;
+import org.kitteh.irc.client.library.event.user.*;
 import org.kitteh.irc.client.library.event.user.ServerNoticeEvent;
 
 public class NetworkEventHandler {
@@ -28,23 +27,24 @@ public class NetworkEventHandler {
 
   @Handler
   public void supportedCapabilities(CapabilitiesSupportedListEvent e) {
-      requestCapabilities(e, e.getSupportedCapabilities());
+    requestCapabilities(e, e.getSupportedCapabilities());
   }
 
   @Handler
   public void newCapabilities(CapabilitiesNewSupportedEvent e) {
-      requestCapabilities(e, e.getNewCapabilities());
+    requestCapabilities(e, e.getNewCapabilities());
   }
 
-  public void requestCapabilities(CapabilityNegotiationRequestEvent e, List<CapabilityState> supported) {
-      // Request the caps we want, based on what's supported
-      String[] wanted = {"echo-message", "invite-notify"};
-      for (var cap : supported) {
-          String name = cap.getName();
-          if (Arrays.stream(wanted).anyMatch(name::equals)) {
-              e.addRequest(name);
-          }
+  public void requestCapabilities(CapabilityNegotiationRequestEvent e,
+                                  List<CapabilityState> supported) {
+    // Request the caps we want, based on what's supported
+    String[] wanted = {"echo-message", "invite-notify"};
+    for (var cap : supported) {
+      String name = cap.getName();
+      if (Arrays.stream(wanted).anyMatch(name::equals)) {
+        e.addRequest(name);
       }
+    }
   }
 
   @Handler
@@ -87,6 +87,19 @@ public class NetworkEventHandler {
     String joinMessage = String.format("%s joined %s", e.getUser().getNick(),
                                        e.getChannel().getName());
     channel.getMessageList().addMessage(new GenericMessage(joinMessage));
+  }
+
+  @Handler
+  public void onPrivateMessage(ActorPrivateMessageEventBase<User> e) {
+    var privateChat = network.getOrAddChat(e.getActor());
+    var messages = privateChat.getMessageList();
+    if (e instanceof PrivateNoticeEvent) {
+      messages.addMessage(new NoticeMessage(e.getActor(), e.getMessage()));
+    } else if (e instanceof PrivateCtcpQueryEvent) {
+      messages.addMessage(new CtcpMessage(e.getActor(), e.getMessage()));
+    } else {
+      messages.addMessage(new PrivMessage(e.getActor(), e.getMessage()));
+    }
   }
 
   @Handler
