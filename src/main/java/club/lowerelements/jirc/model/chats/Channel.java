@@ -10,7 +10,9 @@ import org.kitteh.irc.client.library.event.channel.ChannelNoticeEvent;
 public class Channel extends AbstractChat implements Messageable {
   private org.kitteh.irc.client.library.element.Channel channel;
 
-  public Channel(org.kitteh.irc.client.library.element.Channel channel) {
+  public Channel(Network network,
+                 org.kitteh.irc.client.library.element.Channel channel) {
+    super(network);
     this.channel = channel;
     channel.getClient().getEventManager().registerEventListener(this);
   }
@@ -25,7 +27,9 @@ public class Channel extends AbstractChat implements Messageable {
   }
 
   @Override
-  public MessageReceiver getMessageReceiver() { return channel; }
+  public MessageReceiver getMessageReceiver() {
+    return channel;
+  }
 
   @Handler
   public void onMessage(ActorChannelMessageEventBase<User> e) {

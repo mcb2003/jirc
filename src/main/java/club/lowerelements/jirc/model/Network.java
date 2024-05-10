@@ -30,7 +30,7 @@ public class Network implements Chat {
   }
 
   public void disconnect() {
-      client.shutdown();
+    client.shutdown();
     setStatus(status.DISCONNECTING);
   }
 
@@ -61,6 +61,10 @@ public class Network implements Chat {
   public MessageList getMessageList() {
     return serverMessages;
   }
+  @Override
+  public Network getNetwork() {
+    return this;
+  }
 
   public Status getStatus() { return status; }
 
@@ -89,7 +93,7 @@ public class Network implements Chat {
     if (found.isPresent()) {
       return (Channel)found.get();
     }
-    var channel = new Channel(chan);
+    var channel = new Channel(this, chan);
     addChat(channel);
     return channel;
   }
@@ -160,7 +164,13 @@ public class Network implements Chat {
     public int getIndex() { return index; }
   }
 
-  public enum Status { DISCONNECTED, CONNECTING, NEGOTIATING, CONNECTED, DISCONNECTING }
+  public enum Status {
+    DISCONNECTED,
+    CONNECTING,
+    NEGOTIATING,
+    CONNECTED,
+    DISCONNECTING
+  }
 
   public interface Listener extends EventListener {
     public default void nameChanged(NameChangedEvent e) {}
